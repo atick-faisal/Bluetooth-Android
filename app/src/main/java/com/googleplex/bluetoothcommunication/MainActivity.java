@@ -31,17 +31,17 @@ public class MainActivity extends AppCompatActivity {
     private ListView pairedDevicesList;
     public Button sendButton;
     public EditText editText;
-    public TextView textView, data1, data2, data3;
-    FloatingActionButton floatingActionButton;
+    public TextView textView;
     public String address;
 
     private BluetoothAdapter mBluetoothAdapter;
-    BluetoothSocket bluetoothSocket;
+    private BluetoothSocket bluetoothSocket;
     private static final UUID mUUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
     String receivedMessage;
     private boolean isBtConnected = false;
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
+
     @SuppressLint("HandlerLeak")
     private Handler mHandler = new Handler() { ///////////////////////////////////////////////////// handle received messages
         @Override
@@ -59,7 +59,9 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     };
+
     ////////////////////////////////////////////////////////////////////////////////////////////////
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -74,10 +76,7 @@ public class MainActivity extends AppCompatActivity {
         sendButton = findViewById(R.id.send_button);
         editText = findViewById(R.id.send_data);
         textView = findViewById(R.id.received_data);
-        data1 = findViewById(R.id.data1);
-        data2 = findViewById(R.id.data2);
-        data3 = findViewById(R.id.data3);
-        floatingActionButton = findViewById(R.id.floatingActionButton);
+        FloatingActionButton floatingActionButton = findViewById(R.id.floatingActionButton);
 
         turnOnBluetooth();
 
@@ -95,7 +94,9 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    public void pairedDevicesList() { ////////////////////////////////////////////////////////////// load paired devices and show them in the list
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+
+    public void pairedDevicesList() {
         BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         Set<BluetoothDevice> pairedDevices = bluetoothAdapter.getBondedDevices();
         ArrayList<String> list = new ArrayList<>();
@@ -113,16 +114,20 @@ public class MainActivity extends AppCompatActivity {
         pairedDevicesList.setOnItemClickListener(mListClickListener);
     }
 
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+
     private AdapterView.OnItemClickListener mListClickListener = new AdapterView.OnItemClickListener() {
         public void onItemClick(AdapterView av, View v, int arg2, long arg3) {
             String info = ((TextView) v).getText().toString();
             address = info.substring(info.length() - 17);
             ConnectBluetooth connectBluetooth = new ConnectBluetooth();
-            connectBluetooth.execute(); /////////////////////////////////////////////////////// connect
+            connectBluetooth.execute();
         }
     };
 
-    void turnOnBluetooth() { /////////////////////////////////////////////////////////////////////// turn on bluetooth
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+
+    void turnOnBluetooth() {
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         if (mBluetoothAdapter == null) {
             Toast.makeText(getApplicationContext(), "Bluetooth Device Not Available", Toast.LENGTH_LONG).show();
@@ -138,8 +143,10 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+
     @SuppressLint("StaticFieldLeak")
-    class ConnectBluetooth extends AsyncTask<Void, Void, Void> { /////////////////////////// connect in background
+    class ConnectBluetooth extends AsyncTask<Void, Void, Void> {
         private boolean ConnectSuccess = true;
 
         @Override
@@ -164,12 +171,14 @@ public class MainActivity extends AppCompatActivity {
             if (ConnectSuccess) {
                 isBtConnected = true;
                 ConnectedThread connectedThread = new ConnectedThread(bluetoothSocket);
-                connectedThread.start(); /////////////////////////////////////////////////////////// start looking for received data
+                connectedThread.start();
             }
         }
     }
 
-    private class ConnectedThread extends Thread { ///////////////////////////////////////////////// received data listener
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+
+    private class ConnectedThread extends Thread {
         private final InputStream mInStream;
 
         ConnectedThread(BluetoothSocket socket) {
@@ -206,13 +215,13 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public void onBluetoothMessageReceive(){ /////////////////////////////////////////////////////// Edit here...
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+
+    public void onBluetoothMessageReceive(){
         textView.setText(receivedMessage);
-        String[] parsedData = receivedMessage.split(",");
-        data1.setText(parsedData[0]);
-        data2.setText(parsedData[1]);
-        data3.setText(parsedData[2]);
     }
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////
 
     public void sendMessage(String message){
         if(bluetoothSocket != null){
@@ -223,4 +232,6 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     }
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////
 }
